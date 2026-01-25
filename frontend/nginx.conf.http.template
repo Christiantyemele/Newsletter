@@ -1,0 +1,63 @@
+# Top-level settings
+user  nginx;
+worker_processes  auto;
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+# Required events block
+events {
+    worker_connections 1024;
+}
+
+# HTTP block
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout 65;
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json text/xml application/xml+rss;
+
+    # Increase header buffer sizes to handle large cookies/headers
+    large_client_header_buffers 8 32k;
+
+    server {
+        listen 80;
+        server_name rustcameroon.com www.rustcameroon.com;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /api/ {
+            proxy_pass ${BACKEND_URL}/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+        location /minio/ {
+            proxy_pass http://minio:9000/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            location ~* \.(jpg|jpeg|png|gif|ico|svg|webp)$ {
+                proxy_pass http://minio:9000;
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                add_header X-Content-Type-Options nosniff;
+            }
+        }
+    }
+}

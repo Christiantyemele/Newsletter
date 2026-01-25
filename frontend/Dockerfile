@@ -22,12 +22,14 @@ FROM nginx:alpine
 # Copy built React app
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy Nginx template (with ${BACKEND_URL})
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
+# Copy Nginx templates (with ${BACKEND_URL})
+COPY nginx.conf.template /etc/nginx/nginx.conf.https.template
+COPY nginx.conf.http.template /etc/nginx/nginx.conf.http.template
 
 # Expose HTTP + HTTPS
 EXPOSE 80 443
 
 # Substitute environment variables and start Nginx
-CMD envsubst '$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf \
+CMD TEMPLATE="/etc/nginx/nginx.conf.${NGINX_CONFIG:-https}.template" \
+    && envsubst '$BACKEND_URL' < "$TEMPLATE" > /etc/nginx/nginx.conf \
     && nginx -g 'daemon off;'
