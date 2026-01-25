@@ -7,11 +7,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /root/certs/rustcameroon.com-0001:/etc/letsencrypt/live/rustcameroon.com-0001:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./certbot-www:/var/www/certbot:ro
     environment:
       - BACKEND_URL=http://backend:8000
-      - VITE_API_URL=https://rustcameroon.com/api
-      - NGINX_CONFIG=https
+      - VITE_API_URL=https://${DOMAIN:-rustcameroon.com}/api
+      - DOMAIN=${DOMAIN:-rustcameroon.com}
+      - CERT_NAME=${CERT_NAME:-rustcameroon.com}
+      - NGINX_CONFIG=${NGINX_CONFIG:-https}
     user: "0:0"
     depends_on:
       - backend

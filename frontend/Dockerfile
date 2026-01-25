@@ -1,5 +1,5 @@
 # Use Node.js for building the app
-FROM node:alpine as build
+FROM node:alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -30,6 +30,4 @@ COPY nginx.conf.http.template /etc/nginx/nginx.conf.http.template
 EXPOSE 80 443
 
 # Substitute environment variables and start Nginx
-CMD TEMPLATE="/etc/nginx/nginx.conf.${NGINX_CONFIG:-https}.template" \
-    && envsubst '$BACKEND_URL' < "$TEMPLATE" > /etc/nginx/nginx.conf \
-    && nginx -g 'daemon off;'
+CMD ["sh", "-c", "TEMPLATE=/etc/nginx/nginx.conf.${NGINX_CONFIG:-https}.template && envsubst '$BACKEND_URL $DOMAIN $CERT_NAME' < \"$TEMPLATE\" > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"]

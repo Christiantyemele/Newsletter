@@ -23,7 +23,11 @@ http {
 
     server {
         listen 80;
-        server_name rustcameroon.com www.rustcameroon.com;
+        server_name ${DOMAIN} www.${DOMAIN};
+
+        location ^~ /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
 
         root /usr/share/nginx/html;
         index index.html;
