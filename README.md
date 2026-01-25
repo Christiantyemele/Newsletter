@@ -266,3 +266,14 @@ For support and questions:
 - [ ] Multi-language support
 - [ ] Dark mode toggle
 - [ ] Progressive Web App features
+
+
+
+Requesting a certificate for rustcameroon.com and www.rustcameroon.com
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/rustcameroon.com/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/rustcameroon.com/privkey.pem
+This certificate expires on 2026-04-25.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.

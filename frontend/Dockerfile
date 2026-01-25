@@ -19,6 +19,9 @@ RUN npm run build
 # Use Nginx to serve the app
 FROM nginx:alpine
 
+# envsubst is provided by gettext
+RUN apk add --no-cache gettext
+
 # Copy built React app
 COPY --from=build /app/dist /usr/share/nginx/html
 
